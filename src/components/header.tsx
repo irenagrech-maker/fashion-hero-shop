@@ -7,6 +7,9 @@ import { SearchIcon, UserIcon, CartIcon, MenuIcon, CloseIcon, HeartIcon } from "
 import { SearchModal } from "./search-modal";
 import { MegaMenuNav, MobileMegaMenuContent } from "./mega-menu";
 import { useAuth } from "./auth-provider";
+import { useSocial } from "./social-provider";
+import { NotificationsDropdown } from "./notifications-dropdown";
+import { FollowedShopsDropdown } from "./followed-shops-dropdown";
 
 const secondaryLinks = [
   { label: "About", href: "/about" },
@@ -63,18 +66,43 @@ export function Header({ onCartOpen, cartCount = 0, wishlistCount = 0 }: HeaderP
           >
             <SearchIcon />
           </button>
-          <Link
-            href="/wishlist"
-            aria-label="Wishlist"
-            className="hidden sm:block p-1 hover:opacity-60 transition-opacity relative"
-          >
-            <HeartIcon className="h-5 w-5" />
-            {wishlistCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                {wishlistCount}
-              </span>
-            )}
-          </Link>
+
+          {/* User dashboard — liked, followed, notifications (logged in only) */}
+          {user && (
+            <div className="hidden sm:flex items-center gap-3">
+              {/* Liked products */}
+              <Link
+                href="/wishlist"
+                aria-label="Liked products"
+                className="p-1 hover:opacity-60 transition-opacity relative"
+              >
+                <HeartIcon className="h-5 w-5" />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                    {wishlistCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Followed shops */}
+              <FollowedShopsDropdown />
+
+              {/* Notifications */}
+              <NotificationsDropdown />
+            </div>
+          )}
+
+          {/* Wishlist heart when logged out */}
+          {!user && (
+            <Link
+              href="/wishlist"
+              aria-label="Wishlist"
+              className="hidden sm:block p-1 hover:opacity-60 transition-opacity relative"
+            >
+              <HeartIcon className="h-5 w-5" />
+            </Link>
+          )}
+
           <Link
             href={user ? "/account" : "/account/login"}
             aria-label="Account"

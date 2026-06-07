@@ -5,6 +5,8 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types";
 import { WishlistButton } from "./wishlist-button";
+import { FollowProductButton } from "./follow-product-button";
+import { FollowShopButton } from "./follow-shop-button";
 import { useQuickView } from "./quick-view-provider";
 import { getSellerById } from "@/data/sellers";
 
@@ -98,9 +100,10 @@ export function ProductCard({ product, className }: ProductCardProps) {
           </div>
         </Link>
 
-        {/* Wishlist button — top-right, shows on hover */}
-        <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 md:block hidden">
+        {/* Like + Follow buttons — top-right, shows on hover */}
+        <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 md:flex hidden flex-col gap-1.5 items-center">
           <WishlistButton productId={product.id} className="bg-white/90 rounded-full p-1.5 hover:bg-white" />
+          <FollowProductButton productId={product.id} className="bg-white/90 rounded-full p-1.5 hover:bg-white" />
         </div>
       </div>
 
@@ -112,17 +115,20 @@ export function ProductCard({ product, className }: ProductCardProps) {
           </h3>
           <p className="text-[12px] text-warm-gray mb-0.5">{firstColor?.name}</p>
           {seller && (
-            <p className="text-[11px] text-warm-gray/70 mb-1">
-              Sold by{" "}
-              <span className="text-charcoal/60 hover:text-charcoal transition-colors">
-                {seller.name}
-              </span>
-              {seller.rating >= 4.5 && (
-                <span className="inline-block ml-1 text-[9px] bg-charcoal/10 text-charcoal/70 px-1 py-0.5 rounded uppercase tracking-wide">
-                  Pro
+            <div className="flex items-center gap-1.5 mb-1">
+              <p className="text-[11px] text-warm-gray/70">
+                Sold by{" "}
+                <span className="text-charcoal/60 hover:text-charcoal transition-colors">
+                  {seller.name}
                 </span>
-              )}
-            </p>
+                {seller.rating >= 4.5 && (
+                  <span className="inline-block ml-1 text-[9px] bg-charcoal/10 text-charcoal/70 px-1 py-0.5 rounded uppercase tracking-wide">
+                    Pro
+                  </span>
+                )}
+              </p>
+              <FollowShopButton shopId={seller.id} shopName={seller.name} />
+            </div>
           )}
         </div>
       </Link>

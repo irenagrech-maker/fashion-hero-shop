@@ -8,6 +8,8 @@ import { ColorSwatches } from "@/components/color-swatches";
 import { SizeSelector } from "@/components/size-selector";
 import { useCart } from "@/components/cart-provider";
 import { WishlistButton } from "@/components/wishlist-button";
+import { FollowProductButton } from "@/components/follow-product-button";
+import { FollowShopButton } from "@/components/follow-shop-button";
 import { getSellerById } from "@/data/sellers";
 
 interface ProductInfoProps {
@@ -96,27 +98,33 @@ export function ProductInfo({ product }: ProductInfoProps) {
         <span className="text-charcoal/60">{product.name}</span>
       </nav>
 
-      {/* Product name + wishlist */}
+      {/* Product name + like + follow */}
       <div>
         <div className="flex items-start justify-between gap-3">
           <h1 className="text-2xl md:text-3xl font-normal text-charcoal mb-2">
             {product.name}
           </h1>
-          <WishlistButton productId={product.id} className="mt-1 flex-shrink-0" />
+          <div className="flex items-center gap-2 mt-1 flex-shrink-0">
+            <WishlistButton productId={product.id} />
+            <FollowProductButton productId={product.id} />
+          </div>
         </div>
         <StarRating rating={product.rating} count={product.reviewCount} />
         {seller && (
-          <Link
-            href={`/collections/all?seller=${seller.slug}`}
-            className="text-[12px] text-warm-gray hover:text-charcoal transition-colors mt-1 inline-block"
-          >
-            Sold by <span className="underline">{seller.name}</span>
-            {seller.rating >= 4.5 && (
-              <span className="inline-block ml-1 text-[9px] bg-charcoal/10 text-charcoal/70 px-1 py-0.5 rounded uppercase tracking-wide no-underline">
-                Pro
-              </span>
-            )}
-          </Link>
+          <div className="flex items-center gap-2 mt-1 flex-wrap">
+            <Link
+              href={`/collections/all?seller=${seller.slug}`}
+              className="text-[12px] text-warm-gray hover:text-charcoal transition-colors"
+            >
+              Sold by <span className="underline">{seller.name}</span>
+              {seller.rating >= 4.5 && (
+                <span className="inline-block ml-1 text-[9px] bg-charcoal/10 text-charcoal/70 px-1 py-0.5 rounded uppercase tracking-wide no-underline">
+                  Pro
+                </span>
+              )}
+            </Link>
+            <FollowShopButton shopId={seller.id} shopName={seller.name} />
+          </div>
         )}
       </div>
 

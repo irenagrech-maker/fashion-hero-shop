@@ -4,6 +4,9 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/auth-provider";
+import { useSocial } from "@/components/social-provider";
+import { useActivity } from "@/components/activity-provider";
+import { products } from "@/data/products";
 
 const mockOrders = [
   { id: "SF-10042", date: "March 15, 2026", status: "Delivered", total: 592 },
@@ -13,7 +16,11 @@ const mockOrders = [
 
 export default function AccountPage() {
   const { user, logout } = useAuth();
+  const { likedProductIds } = useSocial();
+  const { activityEnabled, setActivityEnabled } = useActivity();
   const router = useRouter();
+
+  const likedProducts = products.filter((p) => likedProductIds.includes(p.id));
 
   useEffect(() => {
     if (!user) {
@@ -38,6 +45,36 @@ export default function AccountPage() {
       <p className="text-[13px] text-warm-gray mb-10">
         Welcome back to your FashionHero account.
       </p>
+
+      {/* Liked Products */}
+      <section className="mb-10">
+        <div className="flex items-center justify-between mb-4 pb-2 border-b border-black/10">
+          <h2 className="text-[12px] font-medium uppercase tracking-[0.8px] text-charcoal">
+            Liked Products
+          </h2>
+          {likedProducts.length > 0 && (
+            <Link href="/wishlist" className="text-[11px] text-warm-gray underline hover:text-charcoal transition-colors">
+              View all
+            </Link>
+          )}
+        </div>
+        {likedProducts.length === 0 ? (
+          <p className="text-[13px] text-warm-gray">No liked products yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {likedProducts.map((product) => (
+              <Link
+                key={product.id}
+                href={`/products/${product.slug}`}
+                className="flex items-center justify-between py-3 border-b border-black/5 hover:opacity-70 transition-opacity"
+              >
+                <p className="text-[13px] font-medium text-charcoal">{product.name}</p>
+                <p className="text-[13px] text-charcoal">{product.price} zl</p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
 
       {/* Order History */}
       <section className="mb-10">
@@ -91,6 +128,36 @@ export default function AccountPage() {
           <p>123 Sustainable Ave</p>
           <p>San Francisco, CA 94110</p>
           <p>United States</p>
+        </div>
+      </section>
+
+      {/* Preferences */}
+      <section className="mb-10">
+        <h2 className="text-[12px] font-medium uppercase tracking-[0.8px] text-charcoal mb-4 pb-2 border-b border-black/10">
+          Preferences
+        </h2>
+        <div className="flex items-center justify-between py-2">
+          <div>
+            <p className="text-[13px] text-charcoal">Activity notifications</p>
+            <p className="text-[11px] text-warm-gray mt-0.5">
+              Subtle alerts about products and shops you follow
+            </p>
+          </div>
+          <button
+            onClick={() => setActivityEnabled(!activityEnabled)}
+            aria-label={activityEnabled ? "Disable activity notifications" : "Enable activity notifications"}
+            className={[
+              "relative w-10 h-5 rounded-full transition-colors duration-200 flex-shrink-0",
+              activityEnabled ? "bg-charcoal" : "bg-black/20",
+            ].join(" ")}
+          >
+            <span
+              className={[
+                "absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200",
+                activityEnabled ? "translate-x-5" : "translate-x-0.5",
+              ].join(" ")}
+            />
+          </button>
         </div>
       </section>
 
