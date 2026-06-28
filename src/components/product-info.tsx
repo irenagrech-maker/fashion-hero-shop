@@ -113,7 +113,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
         {seller && (
           <div className="flex items-center gap-2 mt-1 flex-wrap">
             <Link
-              href={`/collections/all?seller=${seller.slug}`}
+              href={`/sellers/${seller.slug}`}
               className="text-[12px] text-warm-gray hover:text-charcoal transition-colors"
             >
               Sold by <span className="underline">{seller.name}</span>

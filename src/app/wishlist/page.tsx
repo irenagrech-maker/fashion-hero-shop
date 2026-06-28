@@ -41,7 +41,7 @@ export default function WishlistPage() {
               <div key={seller.id} className="flex items-center justify-between py-3 border-b border-black/5">
                 <div>
                   <Link
-                    href={`/collections/all?seller=${seller.slug}`}
+                    href={`/sellers/${seller.slug}`}
                     className="text-[13px] font-medium text-charcoal hover:opacity-60 transition-opacity"
                   >
                     {seller.name}

@@ -128,7 +128,7 @@ export function generateActivityEvent(
         title: shop.name,
         message: "New items just added to the collection",
         avatarChar: shop.name[0],
-        href: `/collections/all?seller=${shop.slug}`,
+        href: `/sellers/${shop.slug}`,
         shopId: shop.id,
       };
     }
@@ -143,7 +143,7 @@ export function generateActivityEvent(
       title: shop.name,
       message: `${count} people browsing right now`,
       avatarChar: shop.name[0],
-      href: `/collections/all?seller=${shop.slug}`,
+      href: `/sellers/${shop.slug}`,
       shopId: shop.id,
     };
   }

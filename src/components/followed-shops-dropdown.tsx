@@ -62,7 +62,7 @@ export function FollowedShopsDropdown() {
                 return (
                   <Link
                     key={shopId}
-                    href={`/collections/all?seller=${seller.slug}`}
+                    href={`/sellers/${seller.slug}`}
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 border-b border-black/5 last:border-0 hover:bg-black/[0.02] transition-colors"
                   >

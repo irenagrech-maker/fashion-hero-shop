@@ -53,12 +53,16 @@ export function ActivityProvider({ children }: { children: React.ReactNode }) {
   const { followedProductIds, followedShopIds } = useSocial();
 
   // ── User preference ───────────────────────────────────────────────────────
-  const [activityEnabled, setActivityEnabledState] = useState<boolean>(() => {
+  // Start with `true` so server and client agree on initial render (no localStorage on server).
+  // Sync from localStorage after mount to respect a previously saved preference.
+  const [activityEnabled, setActivityEnabledState] = useState<boolean>(true);
+
+  useEffect(() => {
     try {
       const v = localStorage.getItem(PREF_KEY);
-      return v === null ? true : v === "true";
-    } catch { return true; }
-  });
+      if (v !== null) setActivityEnabledState(v === "true");
+    } catch {}
+  }, []);
 
   function setActivityEnabled(v: boolean) {
     setActivityEnabledState(v);

@@ -107,31 +107,35 @@ export function ProductCard({ product, className }: ProductCardProps) {
         </div>
       </div>
 
-      <Link href={`/products/${product.slug}`} className="block">
-        {/* Product info */}
-        <div>
+      {/* Product info — name/color link to product; seller row is a sibling, not nested */}
+      <div>
+        <Link href={`/products/${product.slug}`} className="block">
           <h3 className="text-[12px] font-medium uppercase tracking-[0.5px] mb-0.5">
             {product.name}
           </h3>
           <p className="text-[12px] text-warm-gray mb-0.5">{firstColor?.name}</p>
-          {seller && (
-            <div className="flex items-center gap-1.5 mb-1">
-              <p className="text-[11px] text-warm-gray/70">
-                Sold by{" "}
-                <span className="text-charcoal/60 hover:text-charcoal transition-colors">
-                  {seller.name}
+        </Link>
+        {seller && (
+          <div className="flex items-center justify-between gap-3 mt-1.5 mb-1">
+            <Link
+              href={`/sellers/${seller.slug}`}
+              className="text-[12px] text-charcoal/75 hover:text-charcoal transition-colors truncate"
+            >
+              {seller.name}
+              {seller.rating >= 4.5 && (
+                <span className="inline-block ml-1.5 text-[9px] bg-charcoal/10 text-charcoal/70 px-1 py-0.5 rounded uppercase tracking-wide">
+                  Pro
                 </span>
-                {seller.rating >= 4.5 && (
-                  <span className="inline-block ml-1 text-[9px] bg-charcoal/10 text-charcoal/70 px-1 py-0.5 rounded uppercase tracking-wide">
-                    Pro
-                  </span>
-                )}
-              </p>
-              <FollowShopButton shopId={seller.id} shopName={seller.name} />
-            </div>
-          )}
-        </div>
-      </Link>
+              )}
+            </Link>
+            <FollowShopButton
+              shopId={seller.id}
+              shopName={seller.name}
+              className="flex-shrink-0 px-3 py-1 text-[11px]"
+            />
+          </div>
+        )}
+      </div>
 
       {/* Color swatches */}
       <div className="flex gap-1.5 mb-1.5">
