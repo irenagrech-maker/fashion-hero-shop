@@ -174,19 +174,19 @@ export function CartDrawer({
                       className="border-l-[3px] border-l-charcoal bg-[#e8e4db] px-3 py-3 -mt-2"
                     >
                       <p className="text-[11px] font-semibold uppercase tracking-[0.7px] text-charcoal mb-0.5">
-                        ⭐ Obserwujesz ten sklep
+                        ⭐ You follow this shop
                       </p>
                       <p className="text-[11px] text-warm-gray leading-relaxed mb-2.5">
                         {hasNew
-                          ? "Sprzedawca dodał nowe produkty od Twojej ostatniej wizyty."
-                          : "Sprawdź najnowsze produkty tego sprzedawcy."}
+                          ? "New products added since your last visit."
+                          : "Check out the latest products from this seller."}
                       </p>
                       <Link
                         href={`/sellers/${seller.slug}`}
                         onClick={onClose}
                         className="inline-block bg-charcoal text-white text-[10px] font-medium uppercase tracking-[0.6px] px-3 py-1.5 hover:bg-charcoal-light transition-colors"
                       >
-                        Zobacz nowości →
+                        See what&apos;s new →
                       </Link>
                     </div>
                   );
