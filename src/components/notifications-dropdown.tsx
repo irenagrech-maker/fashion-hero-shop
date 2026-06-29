@@ -2,19 +2,39 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { BellIcon, BellFilledIcon, ChevronLeftIcon } from "./icons";
+import { BellIcon, BellFilledIcon, ChevronLeftIcon, CloseIcon } from "./icons";
 import { useSocial } from "./social-provider";
 import { getSellerById } from "@/data/sellers";
 import { products } from "@/data/products";
 
-const MAX_PRODUCTS = 5;
+const MAX_PRODUCTS      = 5;
+const PEEK_FIRST_DELAY  = 45_000;   // 45 s before first peek
+const PEEK_REPEAT_DELAY = 180_000;  // 3 min between peeks
+const PEEK_DURATION     =   6_000;  // 6 s visible
+const MAX_PEEKS         =       2;  // max peeks per session
 
 export function NotificationsDropdown() {
-  const { unreadNotificationCount, notificationsByShop, markAllRead, seenProductIds, likedProductIds } = useSocial();
+  const {
+    unreadNotificationCount,
+    notificationsByShop,
+    markAllRead,
+    seenProductIds,
+    likedProductIds,
+  } = useSocial();
+
   const [open, setOpen] = useState(false);
   const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
+  const [reminderPeek, setReminderPeek] = useState(false);
 
+  const ref            = useRef<HTMLDivElement>(null);
+  const openRef        = useRef(false);
+  const peekTimerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const peekDismissRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const peekCountRef   = useRef(0);
+
+  useEffect(() => { openRef.current = open; }, [open]);
+
+  // Close dropdown on outside click
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!open) { setSelectedShopId(null); return; }
@@ -27,6 +47,43 @@ export function NotificationsDropdown() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
+  // Periodic peek reminder — fires automatically when user has liked items
+  useEffect(() => {
+    if (likedProductIds.length === 0) {
+      if (peekTimerRef.current) clearTimeout(peekTimerRef.current);
+      if (peekDismissRef.current) clearTimeout(peekDismissRef.current);
+      return;
+    }
+
+    function showPeek() {
+      if (peekCountRef.current >= MAX_PEEKS) return;
+      if (openRef.current) {
+        peekTimerRef.current = setTimeout(showPeek, PEEK_REPEAT_DELAY);
+        return;
+      }
+      setReminderPeek(true);
+      peekCountRef.current++;
+      peekDismissRef.current = setTimeout(() => {
+        setReminderPeek(false);
+        if (peekCountRef.current < MAX_PEEKS) {
+          peekTimerRef.current = setTimeout(showPeek, PEEK_REPEAT_DELAY);
+        }
+      }, PEEK_DURATION);
+    }
+
+    peekTimerRef.current = setTimeout(showPeek, PEEK_FIRST_DELAY);
+    return () => {
+      if (peekTimerRef.current) clearTimeout(peekTimerRef.current);
+      if (peekDismissRef.current) clearTimeout(peekDismissRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [likedProductIds.length]);
+
+  function handleBellClick() {
+    setOpen((prev) => !prev);
+    setReminderPeek(false);
+  }
+
   const newProductsForShop = selectedShopId
     ? products
         .filter((p) => p.sellerId === selectedShopId && !seenProductIds.includes(p.id))
@@ -35,25 +92,61 @@ export function NotificationsDropdown() {
 
   const selectedSeller = selectedShopId ? getSellerById(selectedShopId) : null;
 
+  // Bell badge = shop notifications + 1 if user has saved items
+  const totalBadgeCount = unreadNotificationCount + (likedProductIds.length > 0 ? 1 : 0);
+
   return (
     <div ref={ref} className="relative">
+
+      {/* Bell button */}
       <button
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={handleBellClick}
         aria-label="Notifications"
         className="p-1 hover:opacity-60 transition-opacity relative"
       >
-        {unreadNotificationCount > 0 ? (
+        {totalBadgeCount > 0 ? (
           <BellFilledIcon className="h-5 w-5 text-charcoal" />
         ) : (
           <BellIcon className="h-5 w-5" />
         )}
-        {unreadNotificationCount > 0 && (
+        {totalBadgeCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-            {unreadNotificationCount > 99 ? "99+" : unreadNotificationCount}
+            {totalBadgeCount > 99 ? "99+" : totalBadgeCount}
           </span>
         )}
       </button>
 
+      {/* Auto-peek reminder — slides out from bell periodically */}
+      {reminderPeek && !open && likedProductIds.length > 0 && (
+        <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-black/10 shadow-lg z-50">
+          <div className="px-4 py-3">
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.6px] text-charcoal">
+                ⭐ {likedProductIds.length} saved item{likedProductIds.length !== 1 ? "s" : ""}
+              </p>
+              <button
+                onClick={() => setReminderPeek(false)}
+                className="text-warm-gray hover:text-charcoal flex-shrink-0 transition-opacity"
+                aria-label="Dismiss"
+              >
+                <CloseIcon className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            <p className="text-[11px] text-warm-gray leading-relaxed mb-2.5">
+              Take another look and see if they still catch your eye.
+            </p>
+            <Link
+              href="/wishlist"
+              onClick={() => setReminderPeek(false)}
+              className="inline-block text-[10px] font-medium uppercase tracking-[0.5px] text-charcoal underline underline-offset-2 hover:opacity-60 transition-opacity"
+            >
+              View Saved Items →
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Main dropdown */}
       {open && (
         <div className="absolute right-0 top-full mt-2 w-72 bg-white border border-black/10 shadow-lg z-50">
 
@@ -82,7 +175,7 @@ export function NotificationsDropdown() {
             )}
           </div>
 
-          {/* Saved Items Reminder */}
+          {/* Saved Items Reminder — always visible at top when user has liked items */}
           {!selectedShopId && likedProductIds.length > 0 && (
             <div className="px-4 py-3 border-b border-black/8 bg-[#f5f2eb]">
               <p className="text-[11px] font-semibold uppercase tracking-[0.6px] text-charcoal mb-0.5">
@@ -101,7 +194,7 @@ export function NotificationsDropdown() {
             </div>
           )}
 
-          {/* Shop list */}
+          {/* Shop notifications list */}
           {!selectedShopId && (
             <div className="max-h-72 overflow-y-auto">
               {notificationsByShop.length === 0 ? (
