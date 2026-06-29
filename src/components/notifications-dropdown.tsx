@@ -10,7 +10,7 @@ import { products } from "@/data/products";
 const MAX_PRODUCTS = 5;
 
 export function NotificationsDropdown() {
-  const { unreadNotificationCount, notificationsByShop, markAllRead, seenProductIds } = useSocial();
+  const { unreadNotificationCount, notificationsByShop, markAllRead, seenProductIds, likedProductIds } = useSocial();
   const [open, setOpen] = useState(false);
   const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
@@ -81,6 +81,25 @@ export function NotificationsDropdown() {
               </button>
             )}
           </div>
+
+          {/* Saved Items Reminder */}
+          {!selectedShopId && likedProductIds.length > 0 && (
+            <div className="px-4 py-3 border-b border-black/8 bg-[#f5f2eb]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.6px] text-charcoal mb-0.5">
+                ⭐ You&apos;re following {likedProductIds.length} saved item{likedProductIds.length !== 1 ? "s" : ""}
+              </p>
+              <p className="text-[11px] text-warm-gray leading-relaxed mb-2">
+                Take another look and see if they still catch your eye.
+              </p>
+              <Link
+                href="/wishlist"
+                onClick={() => setOpen(false)}
+                className="text-[10px] font-medium uppercase tracking-[0.5px] text-charcoal underline underline-offset-2 hover:opacity-60 transition-opacity"
+              >
+                View Saved Items
+              </Link>
+            </div>
+          )}
 
           {/* Shop list */}
           {!selectedShopId && (
