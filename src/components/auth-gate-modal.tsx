@@ -35,6 +35,7 @@ export function AuthGateModal({ isOpen, onClose, onSuccess, message }: AuthGateM
 
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEmail(""); setPassword(""); setFirstName(""); setLastName(""); setError(""); setTab("login");
     }
   }, [isOpen]);

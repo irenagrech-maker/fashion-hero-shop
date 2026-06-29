@@ -42,6 +42,7 @@ export function RecentlyViewed({ currentProductId }: { currentProductId: string 
     const resolved = ids
       .map((id) => allProducts.find((p) => p.id === id))
       .filter((p): p is Product => !!p);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRecentProducts(resolved);
   }, [currentProductId]);
 

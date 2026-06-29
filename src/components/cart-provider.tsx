@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useCallback } from "react";
 import type { CartItem, Product, ProductColor } from "@/types";
-import { CartDrawer } from "./cart-drawer";
 
 interface CartContextType {
   items: CartItem[];
@@ -11,6 +10,7 @@ interface CartContextType {
   updateQuantity: (index: number, quantity: number) => void;
   openCart: () => void;
   closeCart: () => void;
+  isOpen: boolean;
   itemCount: number;
 }
 
@@ -70,17 +70,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         updateQuantity,
         openCart: () => setIsOpen(true),
         closeCart: () => setIsOpen(false),
+        isOpen,
         itemCount,
       }}
     >
       {children}
-      <CartDrawer
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        items={items}
-        onUpdateQuantity={updateQuantity}
-        onRemove={removeItem}
-      />
     </CartContext.Provider>
   );
 }

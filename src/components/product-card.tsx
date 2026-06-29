@@ -107,7 +107,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Product info — name/color link to product; seller row is a sibling, not nested */}
+      {/* Product info: name/color links to product page; seller row is a sibling, NOT nested inside */}
       <div>
         <Link href={`/products/${product.slug}`} className="block">
           <h3 className="text-[12px] font-medium uppercase tracking-[0.5px] mb-0.5">
